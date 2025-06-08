@@ -1,0 +1,111 @@
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #e8f5e9 0%, #b2dfdb 100%);
+  color: #234c2e;
+}
+
+nav {
+  background: rgba(255,255,255,0.7);
+  padding: 1rem 2rem;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 2px 8px rgba(34,76,46,0.05);
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+nav a {
+  color: #388e3c;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+nav a:hover {
+  background: #c8e6c9;
+}
+
+form {
+  background: rgba(255,255,255,0.85);
+  max-width: 350px;
+  margin: 3rem auto;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(34,76,46,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+form h2 {
+  margin-bottom: 1rem;
+  color: #388e3c;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+  color: #234c2e;
+  gap: 0.3rem;
+}
+
+input, select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #b2dfdb;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f1f8e9;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+  border: 1.5px solid #388e3c;
+  outline: none;
+}
+
+button {
+  background: linear-gradient(90deg, #a5d6a7 0%, #80cbc4 100%);
+  color: #234c2e;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #81c784 0%, #4db6ac 100%);
+}
+
+div[role="alert"], .error, .message {
+  color: #d32f2f;
+  background: #f8bbd0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.dashboard-message {
+  background: rgba(255,255,255,0.9);
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2.5rem 2rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(34,76,46,0.09);
+  color: #388e3c;
+  font-size: 1.3rem;
+  text-align: center;
+  font-weight: 500;
+}
