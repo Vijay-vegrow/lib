@@ -4,6 +4,7 @@ import AuthForm from '../components/AuthForm';
 import { fetchBooks, createBook, updateBook, deleteBook } from '../api';
 import BookTable from '../components/BookTable';
 import BookForm from '../components/BookForm';
+import BookCardGrid from '../components/BookCardGrid';
 
 export default function AdminPanel() {
   // Admin/librarian management
@@ -99,7 +100,7 @@ export default function AdminPanel() {
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto' }}>
+    <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
       <h2>Add New Admin</h2>
       <AuthForm
         initialValues={{ email: '', password: '' }}
@@ -164,7 +165,14 @@ export default function AdminPanel() {
         editing={editing}
         onCancel={() => setEditing(null)}
       />
-      <BookTable books={books} onEdit={handleEdit} onDelete={handleDelete} canEdit canDelete />
+      <BookCardGrid
+        books={books}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        canEdit
+        canDelete
+        showActions
+      />
       {msg && <div className="message">{msg}</div>}
     </div>
   );

@@ -1,7 +1,7 @@
 // src/pages/Books.jsx
 import { useState, useEffect } from 'react';
 import { fetchBooks, borrowBook } from '../api';
-import BookTable from '../components/BookTable';
+import BookCardGrid from '../components/BookCardGrid'; // <-- Import the card grid component
 import { useNavigate } from 'react-router-dom';
 
 export default function Books() {
@@ -26,7 +26,23 @@ export default function Books() {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto' }}>
+    <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
+      {role === 'member' && (
+        <button
+          style={{
+            marginBottom: 20,
+            padding: '8px 16px',
+            background: '#388e3c',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/borrowings')}
+        >
+          View My Borrowing History
+        </button>
+      )}
       <h2>Available Books</h2>
       <input
         placeholder="Search by title..."
@@ -34,7 +50,11 @@ export default function Books() {
         onChange={e => setQ(e.target.value)}
         style={{ marginBottom: 16, padding: 8, width: 300 }}
       />
-      <BookTable books={books} onBorrow={handleBorrow} canBorrow />
+      <BookCardGrid
+        books={books}
+        onBorrow={handleBorrow}
+        canBorrow={role === 'member'}
+      />
       {msg && <div className="message">{msg}</div>}
     </div>
   );

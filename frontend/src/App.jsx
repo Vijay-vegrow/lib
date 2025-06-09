@@ -22,7 +22,6 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [role, setRole] = useState(localStorage.getItem('role'));
 
-  // Listen for token changes in localStorage (e.g., from other tabs)
   useEffect(() => {
     const handler = () => {
       setToken(localStorage.getItem('token'));
@@ -34,32 +33,54 @@ function App() {
 
   return (
     <BrowserRouter>
-      <nav>
-        {!token && (
-          <>
-            <Link to="/signup">Signup</Link> | <Link to="/login">Login</Link>
-          </>
-        )}
-        {token && (
-          <>
-            {role === 'member' && (
-              <>
-                <Link to="/books">Books</Link> | <Link to="/borrowings">Borrowing History</Link> |{' '}
-              </>
-            )}
-            {role === 'admin' && (
-              <>
-                <Link to="/admin/panel">Admin Panel</Link> |{' '}
-              </>
-            )}
-            {role === 'librarian' && (
-              <>
-                <Link to="/librarian/dashboard">Librarian Dashboard</Link> |{' '}
-              </>
-            )}
-            <Link to="/logout">Logout</Link>
-          </>
-        )}
+      <nav
+        style={{
+          background: 'rgba(255,255,255,0.85)',
+          padding: '1rem 2rem',
+          borderRadius: '0 0 16px 16px',
+          boxShadow: '0 2px 8px rgba(34,76,46,0.05)',
+          marginBottom: '2rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2rem',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span style={{
+          fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
+          fontWeight: 800,
+          fontSize: '1.7rem',
+          color: '#388e3c',
+          letterSpacing: '1px',
+          textShadow: '0 2px 8px #e8f5e9'
+        }}>
+          Vegrow Library
+        </span>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {!token && (
+            <>
+              <Link to="/signup">Signup</Link>
+              <Link to="/login">Login</Link>
+            </>
+          )}
+          {token && (
+            <>
+              {role === 'member' && (
+                <>
+                  <Link to="/books">Books</Link>
+                  <Link to="/borrowings">Borrowing History</Link>
+                </>
+              )}
+              {role === 'admin' && (
+                <Link to="/admin/panel">Admin Panel</Link>
+              )}
+              {role === 'librarian' && (
+                <Link to="/librarian/dashboard">Librarian Dashboard</Link>
+              )}
+              <Link to="/logout">Logout</Link>
+            </>
+          )}
+        </div>
       </nav>
       <Routes>
         <Route path="/signup" element={<Signup />} />

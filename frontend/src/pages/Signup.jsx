@@ -46,7 +46,6 @@ export default function Signup() {
 
   return (
     <>
-      <h1 style={{ textAlign: 'center', color: '#388e3c', marginTop: '2rem' }}>Vegrow Library</h1>
       <AuthForm
         initialValues={initialValues}
         onSubmit={handleSubmit}

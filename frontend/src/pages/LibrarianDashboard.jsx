@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchBooks, createBook, updateBook, deleteBook } from '../api';
-import BookTable from '../components/BookTable';
+import BookCardGrid from '../components/BookCardGrid';
 import BookForm from '../components/BookForm';
 
 export default function LibrarianDashboard() {
@@ -56,8 +56,8 @@ export default function LibrarianDashboard() {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto' }}>
-      <h1 style={{ textAlign: 'center', color: '#388e3c', marginTop: '2rem' }}>Vegrow Library - Librarian Dashboard</h1>
+    <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
+      <h1 style={{ textAlign: 'center', color: '#388e3c', marginTop: '2rem' }}>Librarian Dashboard</h1>
       <h2>{editing ? 'Edit Book' : 'Add Book'}</h2>
       <BookForm
         initialValues={formInitial}
@@ -67,12 +67,13 @@ export default function LibrarianDashboard() {
       />
       {msg && <div className="message">{msg}</div>}
       <h2 style={{ marginTop: '2rem' }}>Books</h2>
-      <BookTable
+      <BookCardGrid
         books={books}
         onEdit={handleEdit}
         onDelete={handleDelete}
         canEdit
         canDelete
+        showActions
       />
     </div>
   );
