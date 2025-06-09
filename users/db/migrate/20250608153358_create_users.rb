@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :email
       t.string :password_digest
       t.string :role
+      t.string :status, default: 'approved'
 
       t.timestamps
     end

@@ -109,3 +109,48 @@ div[role="alert"], .error, .message {
   text-align: center;
   font-weight: 500;
 }
+
+.librarian-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(56,142,60,0.07);
+  overflow: hidden;
+}
+
+.librarian-table th, .librarian-table td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+}
+
+.librarian-table th {
+  background: #e8f5e9;
+  color: #388e3c;
+  font-weight: 600;
+  border-bottom: 1.5px solid #b2dfdb;
+}
+
+.librarian-table tr:not(:last-child) td {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.librarian-table td {
+  color: #234c2e;
+}
+
+.librarian-table button {
+  background: #a5d6a7;
+  color: #234c2e;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.librarian-table button:hover {
+  background: #81c784;
+}

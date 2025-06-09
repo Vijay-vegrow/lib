@@ -20,6 +20,7 @@ export default function Login() {
       if (data.token) {
         setMessage('Login successful! Redirecting...');
         localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role); // <-- This is required!
         window.location.href = data.redirect_to;
       } else {
         setMessage(data.error || 'Login failed');

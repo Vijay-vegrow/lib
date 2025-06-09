@@ -23,11 +23,21 @@ export default function Signup() {
   const handleSubmit = async (values) => {
     try {
       const data = await signup(values.role, values.email, values.password);
-      if (data.token) {
-        setMessage(`Signup successful! Role: ${data.role}`);
-        localStorage.setItem('token', data.token);
+      if (values.role === 'librarian') {
+        // Librarian: always show approval message, no token expected
+        if (data.message) {
+          setMessage('Signup successful! Await admin approval before you can login.');
+        } else {
+          setMessage(data.errors ? data.errors.join(', ') : 'Signup failed');
+        }
       } else {
-        setMessage(data.errors ? data.errors.join(', ') : 'Signup failed');
+        // Member: expect token
+        if (data.token) {
+          setMessage(`Signup successful! Role: ${data.role}`);
+          localStorage.setItem('token', data.token);
+        } else {
+          setMessage(data.errors ? data.errors.join(', ') : 'Signup failed');
+        }
       }
     } catch {
       setMessage('Signup failed');

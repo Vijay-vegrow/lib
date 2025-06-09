@@ -6,7 +6,12 @@ class AuthController < ApplicationController
   end
 
   def signup_librarian
-    signup('librarian')
+    user = User.new(email: params[:email], password: params[:password], role: 'librarian', status: 'pending')
+    if user.save
+      render json: { message: "Signup successful! Await admin approval." }, status: :created
+    else
+      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def signup_member
@@ -16,15 +21,19 @@ class AuthController < ApplicationController
   def login
     user = User.find_by(email: params[:email])
     if user&.authenticate(params[:password])
+      if user.role == 'librarian' && user.status != 'approved'
+        render json: { error: 'Librarian account not approved by admin.' }, status: :unauthorized
+        return
+      end
       token = JsonWebToken.encode(user_id: user.id, role: user.role)
       dashboard_path =
         case user.role
         when 'admin'
-          '/admin/dashboard'
+          '/admin/panel'
         when 'librarian'
           '/librarian/dashboard'
         when 'member'
-          '/member/dashboard'
+          '/books'
         else
           '/'
         end

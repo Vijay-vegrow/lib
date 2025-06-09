@@ -3,4 +3,10 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
   validates :role, presence: true, inclusion: { in: %w[admin librarian member] }
+  validates :status, inclusion: { in: %w[pending approved rejected], allow_nil: true }
+
+  def can_login?
+    return true if role != 'librarian'
+    status == 'approved'
+  end
 end
