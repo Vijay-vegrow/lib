@@ -1,12 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import BookManager from '../components/BookManager';
 import { useAuth } from '../context/AuthContext';
 
-
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export default function Books() {
   const navigate = useNavigate();
   const { role } = useAuth();
+  const query = useQuery();
+  const search = query.get('q') || '';
+
   return (
     <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
       {role === 'member' && (
@@ -27,10 +32,11 @@ export default function Books() {
       )}
       <h2>Available Books</h2>
       <BookManager
-        canBorrow={true}
-        showForm={false}
-        canEdit={false}
-        canDelete={false}
+        canBorrow={role === 'member'}
+        showForm={role === 'librarian' || role === 'admin'}
+        canEdit={role === 'librarian' || role === 'admin'}
+        canDelete={role === 'librarian' || role === 'admin'}
+        search={search}
       />
     </div>
   );

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import AdminPanel from './pages/AdminPanel';
@@ -6,38 +7,88 @@ import Borrowings from './pages/Borrowings';
 import LibrarianDashboard from './pages/LibrarianDashboard';
 import BorrowingApproval from './pages/BorrowingApproval';
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import RequireAuth from './components/RequireAuth';
 import ManageBooks from './pages/ManageBooks';
 import NotFound from './pages/NotFound';
+import LandingPage from './pages/LandingPage';
 
 function NavBar() {
   const { token, role, logout } = useAuth();
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/books?q=${encodeURIComponent(search)}`);
+  };
+
   return (
-    <nav
-      style={{
-        background: 'rgba(255,255,255,0.85)',
-        padding: '1rem 2rem',
-        borderRadius: '0 0 16px 16px',
-        boxShadow: '0 2px 8px rgba(34,76,46,0.05)',
-        marginBottom: '2rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '2rem',
-        justifyContent: 'space-between'
-      }}
-    >
+    <nav style={{
+          background: 'rgba(255, 255, 255, 0.7)',
+    padding: 0,
+    borderRadius: '0 0 16px 16px',
+    boxShadow: '0 2px 8px rgba(34, 76, 46, 0.05)',
+    /* margin-bottom: 1rem; */
+    display: 'flex',
+    
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: '90px',
+    padding:'0 50px'
+    }}>
+      <div className='box'> 
       <span style={{
         fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
         fontWeight: 800,
         fontSize: '1.7rem',
         color: '#388e3c',
         letterSpacing: '1px',
-        textShadow: '0 2px 8px #e8f5e9'
+        textShadow: '0 2px 8px #e8f5e9',
+        
       }}>
         Vegrow Library
       </span>
+      {token && (
+      <span>
+        <form onSubmit={handleSearch} style={{display: 'flex', alignItems: 'center', gap: '0.5rem', flexDirection: 'row',
+          background:'none',boxShadow:'none',justifyContent: 'center'
+        }}>
+          <input
+            type="text"
+            placeholder="Search books..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{background: "rgba(255,255,255,0.8)"}}
+          />
+          <button
+      type="submit"
+      style={{
+        background: '#388e3c',
+        border: 'none',
+        borderRadius: '50%',
+        width: 35,
+        height: 35,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        marginTop:0,
+
+      }}
+      aria-label="Search"
+    >
+     
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="9" cy="9" r="7" stroke="#fff" strokeWidth="2"/>
+        <line x1="14.4142" y1="14" x2="18" y2="17.5858" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    </button>
+        </form>
+      </span>
+      )}
+      </div>
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         {!token && (
           <>
@@ -93,11 +144,13 @@ function App() {
     return () => window.removeEventListener('force-logout', handler);
   }, [logout]);
 
+  // Main app with NavBar and routes
   return (
     <AuthProvider>
       <BrowserRouter>
         <NavBar />
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route
@@ -119,7 +172,7 @@ function App() {
           <Route
             path="/books"
             element={
-              <RequireAuth allowedRoles={['member']}>
+              <RequireAuth>
                 <Books />
               </RequireAuth>
             }
@@ -140,7 +193,7 @@ function App() {
               </RequireAuth>
             }
           />
-        <Route
+          <Route
             path="/manage-books"
             element={
               <RequireAuth allowedRoles={['librarian', 'admin']}>
@@ -148,8 +201,8 @@ function App() {
               </RequireAuth>
             }
           />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   );

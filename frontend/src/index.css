@@ -11,10 +11,12 @@ nav {
   padding: 1rem 2rem;
   border-radius: 0 0 16px 16px;
   box-shadow: 0 2px 8px rgba(34,76,46,0.05);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
+  gap: 10rem;
+  justify-content: space-betweeen;
+  flex-direction: row;
+
 }
 
 nav a {
@@ -188,4 +190,10 @@ div[role="alert"], .error, .message {
 * {
   scrollbar-width: thick;
   scrollbar-color: #388e3c #e8f5e9;
+}
+.box{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }

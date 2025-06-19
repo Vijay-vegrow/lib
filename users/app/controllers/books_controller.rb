@@ -5,7 +5,15 @@ class BooksController < ApplicationController
   before_action :require_admin_or_librarian, only: [:create, :update, :destroy]
 
   def index
-    books = Book.page(params[:page]).per(params[:per_page] || 10)
+    books = Book.all
+    if params[:q].present?
+      q = "%#{params[:q].downcase}%"
+      books = books.where(
+        "LOWER(title) LIKE :q OR LOWER(author) LIKE :q OR LOWER(publisher) LIKE :q OR CAST(publication_year AS CHAR) LIKE :q",
+        q: q
+      )
+    end
+    books = books.page(params[:page]).per(params[:per_page] || 10)
     render json: {
       books: books,
       total: books.total_count,

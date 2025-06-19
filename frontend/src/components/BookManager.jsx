@@ -5,6 +5,7 @@ import { fetchBooks, createBook, updateBook, deleteBook, borrowBook } from '../a
 import Swal from 'sweetalert2'
 
 export default function BookManager({
+  search = '',
   canEdit = false,
   canDelete = false,
   canBorrow = false,
@@ -28,20 +29,18 @@ export default function BookManager({
   const [prefetched, setPrefetched] = useState(null);
 
   useEffect(() => {
-    fetchBooks('', page, perPage).then(data => {
+    fetchBooks(search, page, perPage).then(data => {
       setBooks(Array.isArray(data.books) ? data.books : []);
       setTotalPages(data.total_pages || 1);
-
-      // Prefetch next page if it exists
       if (page < (data.total_pages || 1)) {
-        fetchBooks('', page + 1, perPage).then(nextData => {
+        fetchBooks(search, page + 1, perPage).then(nextData => {
           setPrefetched(Array.isArray(nextData.books) ? nextData.books : []);
         });
       } else {
         setPrefetched(null);
       }
     });
-  }, [page, perPage]);
+  }, [search, page, perPage]);
 
   useEffect(() => {
     if (editing) {
@@ -69,7 +68,7 @@ export default function BookManager({
     try {
       await deleteBook(id);
       setMsg('Book deleted successfully!');
-      fetchBooks().then(setBooks);
+      fetchBooks().then(data=> {setBooks(Array.isArray(data.books) ? data.books: []); setTotalPages(data.total_pages || 1);});
     } catch (err) {
       setMsg(
         err.response?.data?.error ||
@@ -90,7 +89,8 @@ export default function BookManager({
       }
       setEditing(null);
       resetForm();
-      fetchBooks().then(setBooks);
+      fetchBooks().then(data=> {setBooks(Array.isArray(data.books) ? data.books: []);
+      setTotalPages(data.total_pages || 1);});
     } catch {
       setMsg('Error saving book');
     }
@@ -104,7 +104,6 @@ export default function BookManager({
   text: "Happy reading!",
   icon: "success"
 });
-      // Refresh books
       fetchBooks('', page, perPage).then(data => {
         setBooks(Array.isArray(data.books) ? data.books : []);
         setTotalPages(data.total_pages || 1);
