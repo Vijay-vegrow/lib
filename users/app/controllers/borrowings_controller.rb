@@ -1,4 +1,3 @@
-# app/controllers/borrowings_controller.rb
 class BorrowingsController < ApplicationController
   before_action :authenticate_request!
 
@@ -10,28 +9,46 @@ class BorrowingsController < ApplicationController
     else
       return render json: { error: 'Forbidden' }, status: :forbidden
     end
-    render json: borrowings.as_json(include: :book)
+    render json: borrowings.as_json(include: { book: {}, user: { only: [:email] } })
   end
 
   def create
     return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role == 'member'
     book = Book.find(params[:book_id])
-    if !book.available
+    if book.availability_count <= 0
       return render json: { error: 'Book not available' }, status: :unprocessable_entity
     end
     Borrowing.create!(user_id: @current_user.id, book_id: book.id, borrowed_at: Time.now)
-    book.update!(available: false)
+    book.update!(availability_count: book.availability_count - 1)
     render json: { message: 'Book borrowed successfully' }
   end
 
   def return_book
-    borrowing = Borrowing.find_by(id: params[:id], user_id: @current_user.id, returned_at: nil)
+    borrowing = Borrowing.find_by(id: params[:id], user_id: @current_user.id, status: 'borrowed')
     if borrowing
-      borrowing.update!(returned_at: Time.now)
-      borrowing.book.update!(available: true)
-      render json: { message: 'Book returned successfully' }
+      borrowing.update!(status: 'return_requested')
+      render json: { message: 'Return requested. Awaiting librarian approval.' }
     else
-      render json: { error: 'Borrowing record not found' }, status: :not_found
+      render json: { error: 'Borrowing record not found or already requested.' }, status: :not_found
     end
+  end
+
+  def approve_return
+    return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role.in?(%w[librarian admin])
+    borrowing = Borrowing.find_by(id: params[:id], status: 'return_requested')
+    if borrowing
+      borrowing.update!(status: 'returned', returned_at: Time.now)
+      book = borrowing.book
+      book.update!(availability_count: book.availability_count + 1)
+      render json: { message: 'Return approved.' }
+    else
+      render json: { error: 'Borrowing record not found or not pending approval.' }, status: :not_found
+    end
+  end
+
+  def pending_returns
+    return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role.in?(%w[librarian admin])
+    borrowings = Borrowing.includes(:book, :user).where(status: 'return_requested')
+    render json: borrowings.as_json(include: { book: {}, user: { only: [:email] } })
   end
 end

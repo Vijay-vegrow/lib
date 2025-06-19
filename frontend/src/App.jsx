@@ -4,94 +4,140 @@ import AdminPanel from './pages/AdminPanel';
 import Books from './pages/Books';
 import Borrowings from './pages/Borrowings';
 import LibrarianDashboard from './pages/LibrarianDashboard';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import BorrowingApproval from './pages/BorrowingApproval';
+import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import RequireAuth from './components/RequireAuth';
 
-function Logout({ setToken }) {
-  const navigate = useNavigate();
-  React.useEffect(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    setToken(null);
-    navigate('/login');
-  }, [navigate, setToken]);
-  return <div>Logging out...</div>;
+
+function NavBar() {
+  const { token, role, logout } = useAuth();
+  return (
+    <nav
+      style={{
+        background: 'rgba(255,255,255,0.85)',
+        padding: '1rem 2rem',
+        borderRadius: '0 0 16px 16px',
+        boxShadow: '0 2px 8px rgba(34,76,46,0.05)',
+        marginBottom: '2rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '2rem',
+        justifyContent: 'space-between'
+      }}
+    >
+      <span style={{
+        fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
+        fontWeight: 800,
+        fontSize: '1.7rem',
+        color: '#388e3c',
+        letterSpacing: '1px',
+        textShadow: '0 2px 8px #e8f5e9'
+      }}>
+        Vegrow Library
+      </span>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        {!token && (
+          <>
+            <NavLink to="/signup" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Signup</NavLink>
+            <NavLink to="/login" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Login</NavLink>
+          </>
+        )}
+        {token && (
+          <>
+            {role === 'member' && (
+              <NavLink to="/books" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Books</NavLink>
+            )}
+            {role === 'admin' && (
+              <>
+                <NavLink to="/admin/panel" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Admin Panel</NavLink>
+                <NavLink to="/borrowing-approval" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Borrowing Approval</NavLink>
+              </>
+            )}
+            {role === 'librarian' && (
+              <NavLink to="/librarian/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Librarian Dashboard</NavLink>
+            )}
+            <a
+              href="#"
+              onClick={e => {
+                e.preventDefault();
+                logout();
+                window.location.href = '/login';
+              }}
+              className="nav-link"
+            >
+              Logout
+            </a>
+          </>
+        )}
+      </div>
+    </nav>
+  );
 }
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [role, setRole] = useState(localStorage.getItem('role'));
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handler = () => {
-      setToken(localStorage.getItem('token'));
-      setRole(localStorage.getItem('role'));
+      logout();
+      window.location.href = '/login';
     };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, []);
+    window.addEventListener('force-logout', handler);
+    return () => window.removeEventListener('force-logout', handler);
+  }, [logout]);
 
   return (
-    <BrowserRouter>
-      <nav
-        style={{
-          background: 'rgba(255,255,255,0.85)',
-          padding: '1rem 2rem',
-          borderRadius: '0 0 16px 16px',
-          boxShadow: '0 2px 8px rgba(34,76,46,0.05)',
-          marginBottom: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2rem',
-          justifyContent: 'space-between'
-        }}
-      >
-        <span style={{
-          fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
-          fontWeight: 800,
-          fontSize: '1.7rem',
-          color: '#388e3c',
-          letterSpacing: '1px',
-          textShadow: '0 2px 8px #e8f5e9'
-        }}>
-          Vegrow Library
-        </span>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          {!token && (
-            <>
-              <Link to="/signup">Signup</Link>
-              <Link to="/login">Login</Link>
-            </>
-          )}
-          {token && (
-            <>
-              {role === 'member' && (
-                <>
-                  <Link to="/books">Books</Link>
-                  <Link to="/borrowings">Borrowing History</Link>
-                </>
-              )}
-              {role === 'admin' && (
-                <Link to="/admin/panel">Admin Panel</Link>
-              )}
-              {role === 'librarian' && (
-                <Link to="/librarian/dashboard">Librarian Dashboard</Link>
-              )}
-              <Link to="/logout">Logout</Link>
-            </>
-          )}
-        </div>
-      </nav>
-      <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login setToken={setToken} />} />
-        <Route path="/logout" element={<Logout setToken={setToken} />} />
-        <Route path="/admin/panel" element={<AdminPanel />} />
-        <Route path="/librarian/dashboard" element={<LibrarianDashboard />} />
-        <Route path="/books" element={<Books />} />
-        <Route path="/borrowings" element={<Borrowings />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <NavBar />
+        <Routes>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin/panel"
+            element={
+              <RequireAuth allowedRoles={['admin']}>
+                <AdminPanel />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/librarian/dashboard"
+            element={
+              <RequireAuth allowedRoles={['librarian']}>
+                <LibrarianDashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/books"
+            element={
+              <RequireAuth allowedRoles={['member']}>
+                <Books />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/borrowings"
+            element={
+              <RequireAuth allowedRoles={['member']}>
+                <Borrowings />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/borrowing-approval"
+            element={
+              <RequireAuth allowedRoles={['librarian', 'admin']}>
+                <BorrowingApproval />
+              </RequireAuth>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

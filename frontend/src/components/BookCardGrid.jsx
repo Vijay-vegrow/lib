@@ -31,8 +31,10 @@ const IMAGE_STYLE = {
   background: '#f0f0f0',
 };
 
+const DEFAULT_IMAGE = "https://www.omnibookslibrary.com/app/admin/images/books/1654677967.jpg";
+
 export default function BookCardGrid({
-  books,
+  books = [],
   onBorrow,
   onEdit,
   onDelete,
@@ -40,13 +42,8 @@ export default function BookCardGrid({
   canEdit,
   canDelete,
   showActions = true,
-  initialCount = 10,
-  increment = 10,
 }) {
   const [hovered, setHovered] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(initialCount);
-
-  const handleShowMore = () => setVisibleCount(c => c + increment);
 
   return (
     <div>
@@ -59,7 +56,7 @@ export default function BookCardGrid({
           minHeight: 200,
         }}
       >
-        {books.slice(0, visibleCount).map((book, idx) => (
+        {(books || []).map((book, idx) => (
           <div
             key={book.id}
             style={{
@@ -70,20 +67,20 @@ export default function BookCardGrid({
             onMouseLeave={() => setHovered(null)}
           >
             <img
-              src={book.image_url}
+              src={book.image_url && book.image_url.trim() !== "" ? book.image_url : DEFAULT_IMAGE}
               alt={book.title}
               style={IMAGE_STYLE}
-              onError={e => { e.target.src = 'https://via.placeholder.com/120x160?text=No+Image'; }}
+              onError={e => { e.target.src = DEFAULT_IMAGE; }}
             />
             <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 6, textAlign: 'center', color: '#234c2e' }}>{book.title}</div>
             <div style={{ fontSize: 14, color: '#388e3c', marginBottom: 4 }}>{book.author}</div>
             <div style={{ fontSize: 13, color: '#666', marginBottom: 2 }}>{book.publication_year} &middot; {book.publisher}</div>
-            <div style={{ fontSize: 13, color: book.available ? '#388e3c' : '#b71c1c', marginBottom: 8 }}>
-              {book.available ? 'Available' : 'Borrowed'}
+            <div style={{ fontSize: 13, color: '#388e3c', marginBottom: 8 }}>
+              Available: {book.availability_count}
             </div>
             {showActions && (
               <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
-                {canBorrow && book.available && (
+                {canBorrow && book.availability_count > 0 && (
                   <button
                     style={{
                       background: '#a5d6a7',
@@ -139,24 +136,6 @@ export default function BookCardGrid({
           </div>
         ))}
       </div>
-      {visibleCount < books.length && (
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <button
-            style={{
-              padding: '10px 32px',
-              background: '#388e3c',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 16,
-              cursor: 'pointer'
-            }}
-            onClick={handleShowMore}
-          >
-            Show More
-          </button>
-        </div>
-      )}
     </div>
   );
 }

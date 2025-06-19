@@ -16,4 +16,6 @@ Rails.application.routes.draw do
   resources :books, only: [:index, :show, :create, :update, :destroy]
   resources :borrowings, only: [:index, :create]
   post 'borrowings/:id/return', to: 'borrowings#return_book'
+  post 'borrowings/:id/approve_return', to: 'borrowings#approve_return'
+  get 'borrowings/pending_returns', to: 'borrowings#pending_returns'
 end

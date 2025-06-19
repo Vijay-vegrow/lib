@@ -43,17 +43,16 @@ export default function BookForm({ initialValues, onSubmit, editing, onCancel })
         placeholder="Image URL"
         value={formik.values.image_url}
         onChange={formik.handleChange}
-        required
       />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <input
-          name="available"
-          type="checkbox"
-          checked={formik.values.available}
+          name="availability_count"
+          placeholder="Availability Count"
+          type="number"
+          min={0}
+          value={formik.values.availability_count}
           onChange={formik.handleChange}
+          required
         />
-        Available
-      </label>
       <button type="submit">{editing ? 'Update' : 'Add'} Book</button>
       {editing && <button type="button" onClick={onCancel}>Cancel</button>}
     </form>

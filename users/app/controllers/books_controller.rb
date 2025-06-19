@@ -5,9 +5,13 @@ class BooksController < ApplicationController
   before_action :require_admin_or_librarian, only: [:create, :update, :destroy]
 
   def index
-    books = Book.where(available: true)
-    books = books.where("title LIKE ?", "%#{params[:q]}%") if params[:q].present?
-    render json: books
+    books = Book.page(params[:page]).per(params[:per_page] || 10)
+    render json: {
+      books: books,
+      total: books.total_count,
+      page: books.current_page,
+      total_pages: books.total_pages
+    }
   end
 
   def show
@@ -19,6 +23,7 @@ class BooksController < ApplicationController
     if book.save
       render json: book, status: :created
     else
+      Rails.logger.error(book.errors.full_messages)
       render json: { errors: book.errors.full_messages }, status: :unprocessable_entity
     end
   end
@@ -43,7 +48,7 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    params.permit(:title, :author, :publication_year, :publisher, :image_url, :available)
+    params.require(:book).permit(:title, :author, :publication_year, :publisher, :image_url, :availability_count)
   end
 
   def require_admin_or_librarian

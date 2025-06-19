@@ -1,6 +1,7 @@
 // src/pages/Borrowings.jsx
 import { useState, useEffect } from 'react';
 import { fetchBorrowings, returnBook } from '../api';
+import FlexTable from '../components/FlexTable';
 
 export default function Borrowings() {
   const [borrowings, setBorrowings] = useState([]);
@@ -11,42 +12,49 @@ export default function Borrowings() {
   }, []);
 
   const handleReturn = async (id) => {
-    await returnBook(id);
-    setMsg('Book returned!');
-    fetchBorrowings().then(setBorrowings);
+    try {
+      await returnBook(id);
+      setMsg('Return requested. Awaiting librarian approval.');
+      setTimeout(() => {
+        fetchBorrowings().then(setBorrowings);
+      }, 500);
+    } catch {
+      setMsg('Error requesting return.');
+    }
   };
 
   return (
     <div style={{ maxWidth: 900, margin: '2rem auto' }}>
       <h2>Your Borrowing History</h2>
-      <table className="librarian-table">
-        <thead>
-          <tr>
-            <th>Book</th>
-            <th>Borrowed At</th>
-            <th>Returned At</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {borrowings.length === 0 ? (
-            <tr>
-              <td colSpan={4} style={{ textAlign: 'center', color: '#888' }}>No borrowings</td>
-            </tr>
-          ) : (
-            borrowings.map(b => (
-              <tr key={b.id}>
-                <td>{b.book.title}</td>
-                <td>{b.borrowed_at ? new Date(b.borrowed_at).toLocaleString() : '-'}</td>
-                <td>{b.returned_at ? new Date(b.returned_at).toLocaleString() : 'Not returned'}</td>
-                <td>
-                  {!b.returned_at && <button onClick={() => handleReturn(b.id)}>Return</button>}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <FlexTable
+        columns={[
+          { header: 'Book', accessor: row => row.book?.title || 'N/A' },
+          { header: 'Borrowed At', accessor: row => row.borrowed_at ? new Date(row.borrowed_at).toLocaleString() : '-' },
+          { header: 'Returned At', accessor: row => row.returned_at ? new Date(row.returned_at).toLocaleString() : 'Not returned' },
+          {
+            header: 'Status',
+            accessor: row => {
+              if (row.status === 'borrowed') {
+                return (
+                  <button onClick={() => handleReturn(row.id)}>
+                    Return
+                  </button>
+                );
+              }
+              if (row.status === 'return_requested') {
+                return <span style={{ color: '#c68a00' }}>Awaiting approval</span>;
+              }
+              if (row.status === 'returned') {
+                return <span style={{ color: '#388e3c' }}>Returned</span>;
+              }
+              return row.status;
+            }
+          }
+        ]}
+        data={borrowings}
+        emptyMessage="No borrowings"
+        getRowKey={row => row.id}
+      />
       {msg && <div className="message">{msg}</div>}
     </div>
   );
