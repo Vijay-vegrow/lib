@@ -49,8 +49,8 @@ export default function BookCardGrid({
     <div>
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
           gap: 0,
           justifyContent: 'flex-start',
           minHeight: 200,
@@ -81,33 +81,31 @@ export default function BookCardGrid({
             {showActions && (
               <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
                 {canBorrow && book.availability_count > 0 && (
+                  <button style={{padding:'0.5rem 0.5rem'}} onClick={() => onBorrow(book.id)}>Borrow</button>
+                )}
+                {canEdit && (
                   <button
                     style={{
-                      background: '#a5d6a7',
+                      background: 'linear-gradient(90deg, #a5d6a7 0%, #66bb6a 100%)',
                       color: '#234c2e',
                       border: 'none',
                       borderRadius: 6,
                       padding: '6px 16px',
                       fontSize: 15,
                       cursor: 'pointer',
-                      transition: 'background 0.2s'
+                      fontWeight: 500,
+                      boxShadow: '0 1px 4px rgba(56,142,60,0.10)',
+                      transition: 'background 0.2s, color 0.2s, box-shadow 0.2s'
                     }}
-                    onClick={() => onBorrow(book.id)}
-                  >
-                    Borrow
-                  </button>
-                )}
-                {canEdit && (
-                  <button
-                    style={{
-                      background: '#fff59d',
-                      color: '#795548',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '6px 12px',
-                      fontSize: 15,
-                      cursor: 'pointer',
-                      transition: 'background 0.2s'
+                    onMouseOver={e => {
+                      e.currentTarget.style.background = 'linear-gradient(90deg, #66bb6a 0%, #388e3c 100%)';
+                      e.currentTarget.style.color = '#fff';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(56,142,60,0.18)';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = 'linear-gradient(90deg, #a5d6a7 0%, #66bb6a 100%)';
+                      e.currentTarget.style.color = '#234c2e';
+                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(56,142,60,0.10)';
                     }}
                     onClick={() => onEdit(book)}
                   >
@@ -117,14 +115,26 @@ export default function BookCardGrid({
                 {canDelete && (
                   <button
                     style={{
-                      background: '#ef9a9a',
+                      background: 'linear-gradient(90deg, #ffcdd2 0%, #e57373 100%)',
                       color: '#b71c1c',
                       border: 'none',
                       borderRadius: 6,
-                      padding: '6px 12px',
+                      padding: '6px 16px',
                       fontSize: 15,
                       cursor: 'pointer',
-                      transition: 'background 0.2s'
+                      fontWeight: 500,
+                      boxShadow: '0 1px 4px rgba(183,28,28,0.10)',
+                      transition: 'background 0.2s, color 0.2s, box-shadow 0.2s'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.background = 'linear-gradient(90deg, #e57373 0%, #b71c1c 100%)';
+                      e.currentTarget.style.color = '#fff';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(183,28,28,0.18)';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = 'linear-gradient(90deg, #ffcdd2 0%, #e57373 100%)';
+                      e.currentTarget.style.color = '#b71c1c';
+                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(183,28,28,0.10)';
                     }}
                     onClick={() => onDelete(book.id)}
                   >

@@ -71,9 +71,6 @@ export default function AdminPanel() {
         emptyMessage="No approved librarians"
         getRowKey={row => row.id}
       />
-
-      <h2 style={{ marginTop: '2rem' }}>Manage Books</h2>
-      <BookManager canEdit canDelete showForm showActions />
     </div>
   );
 }

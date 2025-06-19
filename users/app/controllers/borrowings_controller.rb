@@ -15,9 +15,19 @@ class BorrowingsController < ApplicationController
   def create
     return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role == 'member'
     book = Book.find(params[:book_id])
+    # Prevent duplicate active borrowings
+    existing = Borrowing.where(
+      user_id: @current_user.id,
+      book_id: book.id,
+      status: ['borrowed', 'return_requested']
+    ).exists?
+    if existing
+      return render json: { error: 'You have already borrowed this book and not yet returned it.' }, status: :unprocessable_entity
+    end
     if book.availability_count <= 0
       return render json: { error: 'Book not available' }, status: :unprocessable_entity
     end
+    
     Borrowing.create!(user_id: @current_user.id, book_id: book.id, borrowed_at: Time.now)
     book.update!(availability_count: book.availability_count - 1)
     render json: { message: 'Book borrowed successfully' }

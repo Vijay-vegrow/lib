@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import BookForm from './BookForm';
 import BookCardGrid from './BookCardGrid';
-import { fetchBooks, createBook, updateBook, deleteBook } from '../api';
+import { fetchBooks, createBook, updateBook, deleteBook, borrowBook } from '../api';
+import Swal from 'sweetalert2'
 
 export default function BookManager({
   canEdit = false,
@@ -21,10 +22,26 @@ export default function BookManager({
     availability_count: ''
   });
   const [msg, setMsg] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [perPage] = useState(10);
+  const [prefetched, setPrefetched] = useState(null);
 
   useEffect(() => {
-    fetchBooks().then(data => setBooks(Array.isArray(data.books) ? data.books : []));
-  }, []);
+    fetchBooks('', page, perPage).then(data => {
+      setBooks(Array.isArray(data.books) ? data.books : []);
+      setTotalPages(data.total_pages || 1);
+
+      // Prefetch next page if it exists
+      if (page < (data.total_pages || 1)) {
+        fetchBooks('', page + 1, perPage).then(nextData => {
+          setPrefetched(Array.isArray(nextData.books) ? nextData.books : []);
+        });
+      } else {
+        setPrefetched(null);
+      }
+    });
+  }, [page, perPage]);
 
   useEffect(() => {
     if (editing) {
@@ -79,6 +96,38 @@ export default function BookManager({
     }
   };
 
+  const handleBorrow = async (bookId) => {
+    try {
+      await borrowBook(bookId);
+      Swal.fire({
+  title: "Borrow successful!",
+  text: "Happy reading!",
+  icon: "success"
+});
+      // Refresh books
+      fetchBooks('', page, perPage).then(data => {
+        setBooks(Array.isArray(data.books) ? data.books : []);
+        setTotalPages(data.total_pages || 1);
+      });
+    } catch (err) {
+      setMsg('Error borrowing book');
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      if (newPage === page + 1 && prefetched) {
+        setBooks(prefetched);
+        setPage(newPage);
+        fetchBooks('', newPage + 1, perPage).then(nextData => {
+          setPrefetched(Array.isArray(nextData.books) ? nextData.books : []);
+        });
+      } else {
+        setPage(newPage);
+      }
+    }
+  };
+
   return (
     <div>
       {showForm && (
@@ -93,12 +142,53 @@ export default function BookManager({
       {msg && <div className="message">{msg}</div>}
       <BookCardGrid
         books={books}
+        onBorrow={canBorrow ? handleBorrow : undefined}
         onEdit={canEdit ? handleEdit : undefined}
         onDelete={canDelete ? handleDelete : undefined}
+        canBorrow={canBorrow}
         canEdit={canEdit}
         canDelete={canDelete}
         showActions={showActions}
       />
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page <= 1}
+          style={{
+            marginRight: 12,
+            padding: '6px 16px',
+            borderRadius: 6,
+            border: 'none',
+            background: page <= 1 ? '#c8e6c9' : '#388e3c',
+            color: page <= 1 ? '#888' : '#fff',
+            cursor: page <= 1 ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            transition: 'background 0.2s'
+          }}
+        >
+          Previous
+        </button>
+        <span style={{ alignSelf: 'center', fontWeight: 500 }}>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page >= totalPages}
+          style={{
+            marginLeft: 12,
+            padding: '6px 16px',
+            borderRadius: 6,
+            border: 'none',
+            background: page >= totalPages ? '#c8e6c9' : '#388e3c',
+            color: page >= totalPages ? '#888' : '#fff',
+            cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            transition: 'background 0.2s'
+          }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

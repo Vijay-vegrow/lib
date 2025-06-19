@@ -9,7 +9,8 @@ import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import RequireAuth from './components/RequireAuth';
-
+import ManageBooks from './pages/ManageBooks';
+import NotFound from './pages/NotFound';
 
 function NavBar() {
   const { token, role, logout } = useAuth();
@@ -53,10 +54,14 @@ function NavBar() {
               <>
                 <NavLink to="/admin/panel" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Admin Panel</NavLink>
                 <NavLink to="/borrowing-approval" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Borrowing Approval</NavLink>
+                <NavLink to="/manage-books" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Manage Books</NavLink>
               </>
             )}
             {role === 'librarian' && (
-              <NavLink to="/librarian/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Librarian Dashboard</NavLink>
+              <>
+              <NavLink to="/librarian/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Manage books</NavLink>
+                <NavLink to="/borrowing-approval" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Borrowing Approval</NavLink>
+              </>
             )}
             <a
               href="#"
@@ -135,7 +140,16 @@ function App() {
               </RequireAuth>
             }
           />
-        </Routes>
+        <Route
+            path="/manage-books"
+            element={
+              <RequireAuth allowedRoles={['librarian', 'admin']}>
+                <ManageBooks />
+              </RequireAuth>
+            }
+          />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
       </BrowserRouter>
     </AuthProvider>
   );

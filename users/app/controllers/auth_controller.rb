@@ -25,7 +25,7 @@ class AuthController < ApplicationController
         render json: { error: 'Librarian account not approved by admin.' }, status: :unauthorized
         return
       end
-      token = JsonWebToken.encode(user_id: user.id, role: user.role)
+      token = JsonWebToken.encode({ user_id: user.id, role: user.role, exp: 24.hours.from_now.to_i })
       dashboard_path =
         case user.role
         when 'admin'
@@ -47,8 +47,7 @@ class AuthController < ApplicationController
   def signup(role)
     user = User.new(email: params[:email], password: params[:password], role: role)
     if user.save
-      token = JsonWebToken.encode(user_id: user.id, role: user.role)
-      render json: { token: token, role: user.role }, status: :created
+      render json: { role: user.role }, status: :created
     else
       render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
     end
