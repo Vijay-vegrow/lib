@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signup } from '../api';
 import AuthForm from '../components/AuthForm';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 export default function Signup() {
   const [message, setMessage] = useState('');
@@ -53,6 +54,9 @@ export default function Signup() {
         buttonLabel="Signup"
         message={message}
       />
+      <div className='google-auth'>
+              <GoogleAuthButton  />
+       </div>
     </>
   );
 }

@@ -13,8 +13,9 @@ export default function Books() {
   const search = query.get('q') || '';
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
+    <div style={{ maxWidth: 1200, margin: '2rem auto',boxSizing: 'border-box' }}>
       {role === 'member' && (
+        <>
         <button
           style={{
             marginBottom: 20,
@@ -29,8 +30,11 @@ export default function Books() {
         >
           View My Borrowing History
         </button>
+        <br/>
+        </>
       )}
-      <h2>Available Books</h2>
+
+      <h2 style={{display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px'}}>Available Books</h2>
       <BookManager
         canBorrow={role === 'member'}
         showForm={role === 'librarian' || role === 'admin'}

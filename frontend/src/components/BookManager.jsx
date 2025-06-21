@@ -66,15 +66,36 @@ export default function BookManager({
 
   const handleDelete = async (id) => {
     try {
-      await deleteBook(id);
-      setMsg('Book deleted successfully!');
-      fetchBooks().then(data=> {setBooks(Array.isArray(data.books) ? data.books: []); setTotalPages(data.total_pages || 1);});
+      const res = await deleteBook(id);
+      if (res.status === 204) {
+        setMsg('Book deleted successfully!');
+        fetchBooks().then(data => {
+          setBooks(Array.isArray(data.books) ? data.books : []);
+          setTotalPages(data.total_pages || 1);
+        });
+      } else {
+        setMsg('Error deleting book');
+      }
     } catch (err) {
-      setMsg(
-        err.response?.data?.error ||
-        err.response?.data?.errors?.[0] ||
-        "Error deleting book"
-      );
+      const backendMsg =
+        err?.response?.data?.error ||
+        err?.response?.data?.errors?.[0] ||
+        err?.message ||
+        "Error deleting book";
+      // If backend says book is borrowed, show a friendly message
+      if (
+        backendMsg.toLowerCase().includes('borrowed') ||
+        backendMsg.toLowerCase().includes('pending return')
+      ) {
+        setMsg('Cannot delete: Book is currently borrowed.');
+      } else {
+        setMsg(backendMsg);
+      }
+      // Optionally refetch to keep UI in sync
+      fetchBooks().then(data => {
+        setBooks(Array.isArray(data.books) ? data.books : []);
+        setTotalPages(data.total_pages || 1);
+      });
     }
   };
 

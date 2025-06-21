@@ -45,7 +45,10 @@ export function updateBook(id, book) {
 
 export function deleteBook(id) {
   return api.delete(`/books/${id}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      Accept: 'application/json'
+    }
   });
 }
 
@@ -101,4 +104,14 @@ export function fetchPendingReturns() {
   return api.get('/borrowings/pending_returns', {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   }).then(res => res.data);
+}
+
+export function googleOAuthLogin(access_token) {
+  return api.post('/auth/google_oauth2_token', { access_token })
+    .then(res => res.data);
+}
+
+export function assignRole(email, role) {
+  return api.post('/api/assign_role', { email, role })
+    .then(res => res.data);
 }

@@ -3,7 +3,7 @@ import { useState } from 'react';
 const CARD_STYLE = {
   width: 180,
   minHeight: 320,
-  background: '#e8f5e9', // Soft green background
+  background: '#e8f5e9',
   borderRadius: 14,
   boxShadow: '0 2px 12px rgba(56,142,60,0.10)',
   margin: 12,
@@ -17,7 +17,7 @@ const CARD_STYLE = {
 };
 
 const CARD_HOVER_STYLE = {
-  background: '#c8e6c9', // Slightly darker green on hover
+  background: '#c8e6c9',
   transform: 'translateY(-12px) scale(1.04)',
   boxShadow: '0 8px 24px rgba(56,142,60,0.18)',
 };
@@ -44,6 +44,8 @@ export default function BookCardGrid({
   showActions = true,
 }) {
   const [hovered, setHovered] = useState(null);
+  const [editHover, setEditHover] = useState(null);
+  const [deleteHover, setDeleteHover] = useState(null);
 
   return (
     <div>
@@ -86,59 +88,63 @@ export default function BookCardGrid({
                 {canEdit && (
                   <button
                     style={{
-                      background: 'linear-gradient(90deg, #a5d6a7 0%, #66bb6a 100%)',
-                      color: '#234c2e',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '6px 16px',
-                      fontSize: 15,
+                      height: 32,
+                      minWidth: 84,
                       cursor: 'pointer',
-                      fontWeight: 500,
-                      boxShadow: '0 1px 4px rgba(56,142,60,0.10)',
-                      transition: 'background 0.2s, color 0.2s, box-shadow 0.2s'
+                      borderRadius: 8,
+                      background: 'rgba(56, 142, 60, 0.12)', // glassy green
+                      textAlign: 'center',
+                      lineHeight: '32px',
+                      border: 'none',
+                      color: '#388e3c', // green text
+                      fontFamily: 'Segoe UI, Arial, sans-serif',
+                      fontWeight: 400, // lighter than 600
+                      fontSize: 15,
+                      transition: 'background 0.2s, color 0.2s',
+                      padding: '0 18px',
                     }}
                     onMouseOver={e => {
-                      e.currentTarget.style.background = 'linear-gradient(90deg, #66bb6a 0%, #388e3c 100%)';
-                      e.currentTarget.style.color = '#fff';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(56,142,60,0.18)';
+                      e.currentTarget.style.background = 'rgba(56, 142, 60, 0.20)';
+                      e.currentTarget.style.color = '#256029';
                     }}
                     onMouseOut={e => {
-                      e.currentTarget.style.background = 'linear-gradient(90deg, #a5d6a7 0%, #66bb6a 100%)';
-                      e.currentTarget.style.color = '#234c2e';
-                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(56,142,60,0.10)';
+                      e.currentTarget.style.background = 'rgba(56, 142, 60, 0.12)';
+                      e.currentTarget.style.color = '#388e3c';
                     }}
                     onClick={() => onEdit(book)}
                   >
-                    Edit
+                    <span style={{ color: '#388e3c', fontFamily: 'Segoe UI, Arial, sans-serif', fontWeight: 400 }}>Edit</span>
                   </button>
                 )}
                 {canDelete && (
                   <button
                     style={{
-                      background: 'linear-gradient(90deg, #ffcdd2 0%, #e57373 100%)',
-                      color: '#b71c1c',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '6px 16px',
-                      fontSize: 15,
+                      height: 32,
+                      minWidth: 84,
                       cursor: 'pointer',
-                      fontWeight: 500,
-                      boxShadow: '0 1px 4px rgba(183,28,28,0.10)',
-                      transition: 'background 0.2s, color 0.2s, box-shadow 0.2s'
+                      borderRadius: 8,
+                      background: 'rgba(183, 28, 28, 0.12)', // glassy red
+                      textAlign: 'center',
+                      lineHeight: '32px',
+                      border: 'none',
+                      color: '#b71c1c', // red text
+                      fontFamily: 'Segoe UI, Arial, sans-serif',
+                      fontWeight: 400,
+                      fontSize: 15,
+                      transition: 'background 0.2s, color 0.2s',
+                      padding: '0 18px',
                     }}
                     onMouseOver={e => {
-                      e.currentTarget.style.background = 'linear-gradient(90deg, #e57373 0%, #b71c1c 100%)';
-                      e.currentTarget.style.color = '#fff';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(183,28,28,0.18)';
+                      e.currentTarget.style.background = 'rgba(183, 28, 28, 0.20)';
+                      e.currentTarget.style.color = '#7f1010';
                     }}
                     onMouseOut={e => {
-                      e.currentTarget.style.background = 'linear-gradient(90deg, #ffcdd2 0%, #e57373 100%)';
+                      e.currentTarget.style.background = 'rgba(183, 28, 28, 0.12)';
                       e.currentTarget.style.color = '#b71c1c';
-                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(183,28,28,0.10)';
                     }}
                     onClick={() => onDelete(book.id)}
                   >
-                    Delete
+                    <span style={{ color: '#b71c1c', fontFamily: 'Segoe UI, Arial, sans-serif', fontWeight: 400 }}>Delete</span>
                   </button>
                 )}
               </div>

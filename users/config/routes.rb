@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   post 'signup/librarian', to: 'auth#signup_librarian'
   post 'signup/member',    to: 'auth#signup_member'
   post 'login',            to: 'auth#login'
-
+  post '/api/assign_role', to: 'sessions#assign_role'
   get 'admin/dashboard',      to: 'admin#dashboard'
   post 'admin/add_admin',     to: 'admin#add_admin'
   get 'admin/pending_librarians', to: 'admin#pending_librarians'
@@ -18,4 +18,5 @@ Rails.application.routes.draw do
   post 'borrowings/:id/return', to: 'borrowings#return_book'
   post 'borrowings/:id/approve_return', to: 'borrowings#approve_return'
   get 'borrowings/pending_returns', to: 'borrowings#pending_returns'
+  post '/auth/google_oauth2_token', to: 'auth#google_oauth2_token'
 end

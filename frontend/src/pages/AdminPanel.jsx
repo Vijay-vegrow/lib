@@ -7,7 +7,6 @@ import {
   fetchPendingLibrarians
 } from '../api';
 import FlexTable from '../components/FlexTable';
-import BookManager from '../components/BookManager';
 
 export default function AdminPanel() {
   // Admin/librarian management
@@ -43,7 +42,7 @@ export default function AdminPanel() {
 
   return (
     <div style={{ maxWidth: 1200, margin: '2rem auto' }}>
-      <h2>Add New Admin</h2>
+      <h2 style={{ display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px'}}>Add New Admin</h2>
       <AuthForm
         initialValues={{ email: '', password: '' }}
         onSubmit={handleAddAdmin}
@@ -53,7 +52,7 @@ export default function AdminPanel() {
       />
       {adminMsg && <div className="message">{adminMsg}</div>}
 
-      <h2 style={{ marginTop: '2rem' }}>Pending Librarians</h2>
+      <h2 style={{ marginTop: '2rem',display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px' }}>Pending Librarians</h2>
       <FlexTable
         columns={[{ header: 'Email', accessor: 'email' }]}
         data={pending}
@@ -64,7 +63,7 @@ export default function AdminPanel() {
         )}
       />
 
-      <h2 style={{ marginTop: '2rem' }}>Approved Librarians</h2>
+      <h2 style={{ marginTop: '2rem',display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px' }}>Approved Librarians</h2>
       <FlexTable
         columns={[{ header: 'Email', accessor: 'email' }]}
         data={approved}

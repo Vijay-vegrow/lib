@@ -57,7 +57,7 @@ export default function BorrowingApproval() {
 
   return (
     <div style={{ maxWidth: 900, margin: '2rem auto' }}>
-      <h2>Pending Book Returns</h2>
+      <h2 style={{display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px'}}>Pending Book Returns</h2>
       {msg && <div className="message">{msg}</div>}
       <FlexTable
         columns={[
@@ -74,7 +74,7 @@ export default function BorrowingApproval() {
         )}
       />
 
-      <h2 style={{ marginTop: '2rem' }}>All Borrowing Records</h2>
+      <h2 style={{ marginTop: '2rem',display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px' }}>All Borrowing Records</h2>
       <div style={{ overflowX: 'auto' }}>
         <FlexTable
           columns={[

@@ -43,6 +43,41 @@ class AuthController < ApplicationController
     end
   end
 
+  def google_oauth2_token
+    access_token = params[:access_token]
+    if access_token.blank?
+      render json: { error: 'No access token provided' }, status: :bad_request and return
+    end
+
+    begin
+      client = Signet::OAuth2::Client.new(access_token: access_token)
+      service = Google::Apis::Oauth2V2::Oauth2Service.new
+      service.authorization = client
+      profile = service.get_userinfo
+
+      unless profile&.email
+        render json: { error: 'Could not fetch Google profile' }, status: :unauthorized and return
+      end
+
+      user = User.find_by(email: profile.email)
+      unless user
+        # User does not exist, ask frontend to select role
+        render json: { email: profile.email }, status: :ok and return
+      end
+
+      # Block unapproved librarians
+      if user.role == 'librarian' && user.status != 'approved'
+        render json: { error: 'Librarian account not approved by admin.' }, status: :unauthorized and return
+      end
+
+      token = JsonWebToken.encode(user_id: user.id, role: user.role)
+      render json: { token: token, role: user.role }, status: :ok
+    rescue => e
+      Rails.logger.error "Google OAuth error: #{e.message}"
+      render json: { error: 'Invalid Google token' }, status: :unauthorized
+    end
+  end
+
   private
   def signup(role)
     user = User.new(email: params[:email], password: params[:password], role: role)

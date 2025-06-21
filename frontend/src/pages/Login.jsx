@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { login } from '../api';
 import AuthForm from '../components/AuthForm';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -39,6 +40,10 @@ export default function Login() {
         buttonLabel="Login"
         message={message}
       />
+       <div className='google-auth'>
+        <GoogleAuthButton  />
+       </div>
+        
     </>
   );
 }

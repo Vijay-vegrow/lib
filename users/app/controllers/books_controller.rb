@@ -45,8 +45,11 @@ class BooksController < ApplicationController
   end
 
   def destroy
-    @book.destroy
-    head :no_content
+    if @book.destroy
+      head :no_content
+    else
+      render json: { error: @book.errors.full_messages.to_sentence }, status: :unprocessable_entity
+    end
   end
 
   private

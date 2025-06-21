@@ -12,6 +12,7 @@ import RequireAuth from './components/RequireAuth';
 import ManageBooks from './pages/ManageBooks';
 import NotFound from './pages/NotFound';
 import LandingPage from './pages/LandingPage';
+import RoleSelect from './pages/RoleSelect';
 
 function NavBar() {
   const { token, role, logout } = useAuth();
@@ -35,8 +36,7 @@ function NavBar() {
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    height: '90px',
-    padding:'0 50px'
+    padding:'50px'
     }}>
       <div className='box'> 
       <span style={{
@@ -201,6 +201,7 @@ function App() {
               </RequireAuth>
             }
           />
+          <Route path="/role-select" element={<RoleSelect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
