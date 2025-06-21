@@ -11,4 +11,10 @@ class ApplicationController < ActionController::API
     end
     render json: { error: 'Unauthorized' }, status: :unauthorized unless @current_user
   end
+
+  def require_admin_or_librarian
+    unless @current_user && (@current_user.role == 'admin' || @current_user.role == 'librarian')
+      render json: { error: 'Forbidden' }, status: :forbidden
+    end
+  end
 end

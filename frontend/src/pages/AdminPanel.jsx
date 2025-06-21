@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import AuthForm from '../components/AuthForm';
+import StatsDashboard from '../components/StatsDashboard';  
 import {
   addAdmin,
   approveLibrarian,

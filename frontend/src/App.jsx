@@ -13,6 +13,7 @@ import ManageBooks from './pages/ManageBooks';
 import NotFound from './pages/NotFound';
 import LandingPage from './pages/LandingPage';
 import RoleSelect from './pages/RoleSelect';
+import StatsDashboard from './components/StatsDashboard';
 
 function NavBar() {
   const { token, role, logout } = useAuth();
@@ -30,11 +31,12 @@ function NavBar() {
     padding: 0,
     borderRadius: '0 0 16px 16px',
     boxShadow: '0 2px 8px rgba(34, 76, 46, 0.05)',
-    /* margin-bottom: 1rem; */
     display: 'flex',
-    
     justifyContent: 'space-between',
     flexDirection: 'row',
+    flexWrap: "nowrap", 
+    gap: "1.5rem",      // Space between items
+    overflowX: "auto", 
     alignItems: 'center',
     padding:'50px'
     }}>
@@ -106,12 +108,14 @@ function NavBar() {
                 <NavLink to="/admin/panel" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Admin Panel</NavLink>
                 <NavLink to="/borrowing-approval" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Borrowing Approval</NavLink>
                 <NavLink to="/manage-books" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Manage Books</NavLink>
+                <NavLink to="/stats" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Stats</NavLink>
               </>
             )}
             {role === 'librarian' && (
               <>
               <NavLink to="/librarian/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Manage books</NavLink>
                 <NavLink to="/borrowing-approval" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Borrowing Approval</NavLink>
+                <NavLink to="/stats" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Stats</NavLink>
               </>
             )}
             <a
@@ -202,6 +206,7 @@ function App() {
             }
           />
           <Route path="/role-select" element={<RoleSelect />} />
+          <Route path="/stats" element={<StatsDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

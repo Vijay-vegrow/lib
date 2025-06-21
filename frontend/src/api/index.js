@@ -115,3 +115,21 @@ export function assignRole(email, role) {
   return api.post('/api/assign_role', { email, role })
     .then(res => res.data);
 }
+
+export function fetchStatsSummary() {
+  return api.get('/stats/summary', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  }).then(res => res.data);
+}
+
+export function fetchBorrowTrends() {
+  return api.get('/stats/borrow_trends', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  }).then(res => res.data);
+}
+
+export function fetchHotBooks() {
+  return api.get('/stats/hot_books', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  }).then(res => res.data);
+}

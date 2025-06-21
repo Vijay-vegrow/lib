@@ -19,4 +19,8 @@ Rails.application.routes.draw do
   post 'borrowings/:id/approve_return', to: 'borrowings#approve_return'
   get 'borrowings/pending_returns', to: 'borrowings#pending_returns'
   post '/auth/google_oauth2_token', to: 'auth#google_oauth2_token'
+
+  get '/stats/summary', to: 'stats#summary'
+  get '/stats/borrow_trends', to: 'stats#borrow_trends'
+  get '/stats/hot_books', to: 'stats#hot_books'
 end
