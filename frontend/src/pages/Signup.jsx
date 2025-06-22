@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signup } from '../api';
 import AuthForm from '../components/AuthForm';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import TimedMessage from '../components/TimedMessage';
 
 export default function Signup() {
   const [message, setMessage] = useState('');
@@ -24,21 +25,12 @@ export default function Signup() {
   const handleSubmit = async (values) => {
     try {
       const data = await signup(values.role, values.email, values.password);
-      if (values.role === 'librarian') {
-        // Librarian: always show approval message, no token expected
-        if (data.message) {
-          setMessage('Signup successful! Await admin approval before you can login.');
-        } else {
-          setMessage(data.errors ? data.errors.join(', ') : 'Signup failed');
-        }
+      if (data.errors) {
+        setMessage(data.errors.join(', '));
+      } else if (values.role === 'librarian') {
+        setMessage('Signup successful! Await admin approval before you can login.');
       } else {
-        // Member: expect token
-        if (data.token) {
-          setMessage(`Signup successful! Role: ${data.role}`);
-          localStorage.setItem('token', data.token);
-        } else {
-          setMessage(data.errors ? data.errors.join(', ') : 'Signup failed');
-        }
+        setMessage('Signup successful! You can now log in.');
       }
     } catch {
       setMessage('Signup failed');
@@ -47,16 +39,16 @@ export default function Signup() {
 
   return (
     <>
+      <TimedMessage message={message} onClose={() => setMessage('')} />
       <AuthForm
         initialValues={initialValues}
         onSubmit={handleSubmit}
         fields={fields}
         buttonLabel="Signup"
-        message={message}
       />
       <div className='google-auth'>
-              <GoogleAuthButton  />
-       </div>
+        <GoogleAuthButton />
+      </div>
     </>
   );
 }

@@ -3,6 +3,7 @@ import BookForm from './BookForm';
 import BookCardGrid from './BookCardGrid';
 import { fetchBooks, createBook, updateBook, deleteBook, borrowBook } from '../api';
 import Swal from 'sweetalert2'
+import TimedMessage from './TimedMessage';
 
 export default function BookManager({
   search = '',
@@ -28,18 +29,25 @@ export default function BookManager({
   const [perPage] = useState(10);
   const [prefetched, setPrefetched] = useState(null);
 
-  useEffect(() => {
-    fetchBooks(search, page, perPage).then(data => {
+  // Always use current search, page, perPage for fetching
+  const refetchBooks = (customPage = page) => {
+    fetchBooks(search, customPage, perPage).then(data => {
       setBooks(Array.isArray(data.books) ? data.books : []);
       setTotalPages(data.total_pages || 1);
-      if (page < (data.total_pages || 1)) {
-        fetchBooks(search, page + 1, perPage).then(nextData => {
+      // Prefetch next page if possible
+      if (customPage < (data.total_pages || 1)) {
+        fetchBooks(search, customPage + 1, perPage).then(nextData => {
           setPrefetched(Array.isArray(nextData.books) ? nextData.books : []);
         });
       } else {
         setPrefetched(null);
       }
     });
+  };
+
+  useEffect(() => {
+    refetchBooks();
+    // eslint-disable-next-line
   }, [search, page, perPage]);
 
   useEffect(() => {
@@ -69,10 +77,7 @@ export default function BookManager({
       const res = await deleteBook(id);
       if (res.status === 204) {
         setMsg('Book deleted successfully!');
-        fetchBooks().then(data => {
-          setBooks(Array.isArray(data.books) ? data.books : []);
-          setTotalPages(data.total_pages || 1);
-        });
+        refetchBooks();
       } else {
         setMsg('Error deleting book');
       }
@@ -82,7 +87,6 @@ export default function BookManager({
         err?.response?.data?.errors?.[0] ||
         err?.message ||
         "Error deleting book";
-      // If backend says book is borrowed, show a friendly message
       if (
         backendMsg.toLowerCase().includes('borrowed') ||
         backendMsg.toLowerCase().includes('pending return')
@@ -91,11 +95,7 @@ export default function BookManager({
       } else {
         setMsg(backendMsg);
       }
-      // Optionally refetch to keep UI in sync
-      fetchBooks().then(data => {
-        setBooks(Array.isArray(data.books) ? data.books : []);
-        setTotalPages(data.total_pages || 1);
-      });
+      refetchBooks();
     }
   };
 
@@ -110,8 +110,7 @@ export default function BookManager({
       }
       setEditing(null);
       resetForm();
-      fetchBooks().then(data=> {setBooks(Array.isArray(data.books) ? data.books: []);
-      setTotalPages(data.total_pages || 1);});
+      refetchBooks();
     } catch {
       setMsg('Error saving book');
     }
@@ -121,14 +120,11 @@ export default function BookManager({
     try {
       await borrowBook(bookId);
       Swal.fire({
-  title: "Borrow successful!",
-  text: "Happy reading!",
-  icon: "success"
-});
-      fetchBooks('', page, perPage).then(data => {
-        setBooks(Array.isArray(data.books) ? data.books : []);
-        setTotalPages(data.total_pages || 1);
+        title: "Borrow successful!",
+        text: "Happy reading!",
+        icon: "success"
       });
+      refetchBooks();
     } catch (err) {
       setMsg('Error borrowing book');
     }
@@ -139,13 +135,81 @@ export default function BookManager({
       if (newPage === page + 1 && prefetched) {
         setBooks(prefetched);
         setPage(newPage);
-        fetchBooks('', newPage + 1, perPage).then(nextData => {
+        // Prefetch next page after moving
+        fetchBooks(search, newPage + 1, perPage).then(nextData => {
           setPrefetched(Array.isArray(nextData.books) ? nextData.books : []);
         });
       } else {
         setPage(newPage);
       }
     }
+  };
+
+  // Helper to generate a windowed page button array with ellipsis
+  function getPageButtons(current, total) {
+    const window = 2;
+    let pages = [];
+
+    // Always show first page
+    pages.push(1);
+
+    // Show left ellipsis if needed
+    if (current - window > 2) {
+      pages.push('...');
+    }
+
+    // Show window of pages around current
+    for (let i = Math.max(2, current - window); i <= Math.min(total - 1, current + window); i++) {
+      pages.push(i);
+    }
+
+    // Show right ellipsis if needed
+    if (current + window < total - 1) {
+      pages.push('...');
+    }
+
+    // Always show last page if more than one page
+    if (total > 1) {
+      pages.push(total);
+    }
+
+    // Remove duplicates while preserving order
+    return pages.filter((v, i, a) => a.indexOf(v) === i);
+  }
+
+  // Render small, centered page buttons with ellipsis for large page counts
+  const renderPageButtons = () => {
+    if (totalPages <= 1) return null;
+    const buttons = getPageButtons(page, totalPages);
+    return (
+      <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
+        {buttons.map((btn, idx) =>
+          btn === "..." ? (
+            <span key={`ellipsis-${idx}`} style={{ padding: "2px 8px", color: "#888", fontSize: 13 }}>…</span>
+          ) : (
+            <button
+              key={btn}
+              onClick={() => handlePageChange(btn)}
+              style={{
+                margin: "0 2px",
+                padding: "2px 10px",
+                borderRadius: 4,
+                border: btn === page ? "1.5px solid #388e3c" : "1px solid #ccc",
+                background: btn === page ? "#e8f5e9" : "#fff",
+                color: btn === page ? "#388e3c" : "#333",
+                fontWeight: btn === page ? 700 : 400,
+                fontSize: 13,
+                cursor: btn === page ? "default" : "pointer",
+                minWidth: 28,
+              }}
+              disabled={btn === page}
+            >
+              {btn}
+            </button>
+          )
+        )}
+      </div>
+    );
   };
 
   return (
@@ -159,7 +223,7 @@ export default function BookManager({
           onCancel={() => setEditing(null)}
         />
       )}
-      {msg && <div className="message">{msg}</div>}
+      <TimedMessage message={msg} onClose={() => setMsg('')} />
       <BookCardGrid
         books={books}
         onBorrow={canBorrow ? handleBorrow : undefined}
@@ -170,45 +234,7 @@ export default function BookManager({
         canDelete={canDelete}
         showActions={showActions}
       />
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page <= 1}
-          style={{
-            marginRight: 12,
-            padding: '6px 16px',
-            borderRadius: 6,
-            border: 'none',
-            background: page <= 1 ? '#c8e6c9' : '#388e3c',
-            color: page <= 1 ? '#888' : '#fff',
-            cursor: page <= 1 ? 'not-allowed' : 'pointer',
-            fontWeight: 500,
-            transition: 'background 0.2s'
-          }}
-        >
-          Previous
-        </button>
-        <span style={{ alignSelf: 'center', fontWeight: 500 }}>
-          Page {page} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page >= totalPages}
-          style={{
-            marginLeft: 12,
-            padding: '6px 16px',
-            borderRadius: 6,
-            border: 'none',
-            background: page >= totalPages ? '#c8e6c9' : '#388e3c',
-            color: page >= totalPages ? '#888' : '#fff',
-            cursor: page >= totalPages ? 'not-allowed' : 'pointer',
-            fontWeight: 500,
-            transition: 'background 0.2s'
-          }}
-        >
-          Next
-        </button>
-      </div>
+      {renderPageButtons()}
     </div>
   );
 }

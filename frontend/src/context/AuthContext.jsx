@@ -1,5 +1,21 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
+let tokenGetter = () => null;
+let roleGetter = () => null;
+
+export function setTokenGetter(fn) {
+  tokenGetter = fn;
+}
+export function getToken() {
+  return tokenGetter();
+}
+export function setRoleGetter(fn) {
+  roleGetter = fn;
+}
+export function getRole() {
+  return roleGetter();
+}
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -14,6 +30,11 @@ export function AuthProvider({ children }) {
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
   }, []);
+
+  useEffect(() => {
+    setTokenGetter(() => token);
+    setRoleGetter(() => role);
+  }, [token, role]);
 
   const login = (token, role) => {
     localStorage.setItem('token', token);

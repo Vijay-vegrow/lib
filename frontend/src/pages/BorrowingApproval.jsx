@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchPendingReturns, ApproveReturn, fetchBorrowings } from '../api';
 import FlexTable from '../components/FlexTable';
+import TimedMessage from '../components/TimedMessage';
 
 function ApproveButton({ id, onApprove }) {
   const [loading, setLoading] = useState(false);
@@ -58,7 +59,7 @@ export default function BorrowingApproval() {
   return (
     <div style={{ maxWidth: 900, margin: '2rem auto' }}>
       <h2 style={{display:'inline-block',borderBottom:'2px solid green', paddingBottom:'5px'}}>Pending Book Returns</h2>
-      {msg && <div className="message">{msg}</div>}
+      <TimedMessage message={msg} onClose={() => setMsg('')} />
       <FlexTable
         columns={[
           { header: 'Book', accessor: row => row.book?.title || 'N/A' },

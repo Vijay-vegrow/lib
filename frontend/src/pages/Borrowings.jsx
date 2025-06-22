@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { fetchBorrowings, returnBook } from '../api';
 import FlexTable from '../components/FlexTable';
+import TimedMessage from '../components/TimedMessage';
 
 export default function Borrowings() {
   const [borrowings, setBorrowings] = useState([]);
@@ -55,7 +56,7 @@ export default function Borrowings() {
         emptyMessage="No borrowings"
         getRowKey={row => row.id}
       />
-      {msg && <div className="message">{msg}</div>}
+      {msg && <TimedMessage message={msg} onClose={() => setMsg('')} />}
     </div>
   );
 }
