@@ -9,7 +9,13 @@ class BorrowingsController < ApplicationController
     else
       return render json: { error: 'Forbidden' }, status: :forbidden
     end
-    render json: borrowings.as_json(include: { book: {}, user: { only: [:email] } })
+    render json: borrowings.as_json(
+      include: {
+        book: {},
+        user: { only: [:email] },
+        approved_by: { only: [:email, :name, :id] }
+      }
+    )
   end
 
   def create
@@ -47,7 +53,7 @@ class BorrowingsController < ApplicationController
     return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role.in?(%w[librarian admin])
     borrowing = Borrowing.find_by(id: params[:id], status: 'return_requested')
     if borrowing
-      borrowing.update!(status: 'returned', returned_at: Time.now)
+      borrowing.update!(status: 'returned', returned_at: Time.now, approved_by: @current_user)
       book = borrowing.book
       book.update!(availability_count: book.availability_count + 1)
       render json: { message: 'Return approved.' }
@@ -59,6 +65,12 @@ class BorrowingsController < ApplicationController
   def pending_returns
     return render json: { error: 'Forbidden' }, status: :forbidden unless @current_role.in?(%w[librarian admin])
     borrowings = Borrowing.includes(:book, :user).where(status: 'return_requested')
-    render json: borrowings.as_json(include: { book: {}, user: { only: [:email] } })
+    render json: borrowings.as_json(
+      include: {
+        book: {},
+        user: { only: [:email] },
+        approved_by: { only: [:email, :name, :id] }
+      }
+    )
   end
 end

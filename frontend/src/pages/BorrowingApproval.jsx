@@ -82,7 +82,8 @@ export default function BorrowingApproval() {
             { header: 'Book', accessor: row => row.book?.title || 'N/A' },
             { header: 'Member Email', accessor: row => row.user?.email || 'N/A' },
             { header: 'Borrowed At', accessor: row => row.borrowed_at ? new Date(row.borrowed_at).toLocaleString() : '-' },
-            { header: 'Returned At', accessor: row => row.returned_at ? new Date(row.returned_at).toLocaleString() : 'Not returned' }
+            { header: 'Returned At', accessor: row => row.returned_at ? new Date(row.returned_at).toLocaleString() : 'Not returned' },
+            { header: 'Approved By', accessor: row => row.approved_by?.email || row.approved_by?.name || '—' }
           ]}
           data={allBorrowings}
           emptyMessage="No borrowings"
