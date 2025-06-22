@@ -32,6 +32,15 @@ export default function Login() {
   const { token, role, login: authLogin } = useAuth();
   const navigate = useNavigate();
 
+  // Add a key that changes on logout
+  const [googleKey, setGoogleKey] = useState(0);
+
+  useEffect(() => {
+    if (!token) {
+      setGoogleKey(prev => prev + 1); // force remount on logout
+    }
+  }, [token]);
+
   // Redirect if already logged in and token is valid
   useEffect(() => {
     if (token && !isTokenExpired(token)) {
@@ -63,8 +72,14 @@ export default function Login() {
       } else {
         showMessage(data.error || 'Login failed');
       }
-    } catch {
-      showMessage('Login failed');
+    } catch (err) {
+      // Extract error message from backend if available
+      const backendMsg =
+        err?.response?.data?.error ||
+        err?.response?.data?.errors?.[0] ||
+        err?.message ||
+        "Login failed";
+      showMessage(backendMsg);
     }
   };
 
@@ -78,7 +93,7 @@ export default function Login() {
         buttonLabel="Login"
       />
       <div className='google-auth'>
-        <GoogleAuthButton />
+        <GoogleAuthButton key={googleKey} />
       </div>
     </>
   );

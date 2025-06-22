@@ -68,6 +68,7 @@ export default function Signup() {
         showMessage('Signup successful! Await admin approval before you can login.');
       } else {
         showMessage('Signup successful! You can now log in.');
+        setTimeout(() => navigate('/login', { replace: true }), 2000);
       }
     } catch {
       showMessage('Signup failed');

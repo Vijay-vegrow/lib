@@ -111,3 +111,15 @@ export function fetchBorrowTrends() {
 export function fetchHotBooks() {
   return api.get('/stats/hot_books').then(res => res.data);
 }
+
+export function deleteLibrarian(id) {
+  return api.delete(`/admin/librarians/${id}`);
+}
+
+export function fetchAllUsers() {
+  return api.get('/admin/users').then(res => res.data);
+}
+
+export function deleteUser(id) {
+  return api.delete(`/admin/users/${id}`);
+}

@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   get 'admin/pending_librarians', to: 'admin#pending_librarians'
   post 'admin/approve_librarian', to: 'admin#approve_librarian'
   get 'admin/approved_librarians', to: 'admin#approved_librarians'
+  delete '/admin/librarians/:id', to: 'admin#destroy_librarian'
+  get '/admin/users', to: 'admin#users'
+  delete '/admin/users/:id', to: 'admin#destroy_user'
 
   get 'librarian/dashboard',  to: 'librarian#dashboard'
   get 'member/dashboard',     to: 'member#dashboard'
