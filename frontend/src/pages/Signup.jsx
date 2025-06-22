@@ -1,12 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { signup } from '../api';
 import AuthForm from '../components/AuthForm';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 import TimedMessage from '../components/TimedMessage';
+import { useAuth } from '../context/AuthContext';
+
+function getHomePage(role) {
+  if (role === 'admin') return '/admin/panel';
+  if (role === 'librarian') return '/librarian/dashboard';
+  if (role === 'member') return '/books';
+  return '/';
+}
+
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.exp) return false;
+    return Date.now() >= payload.exp * 1000;
+  } catch {
+    return true;
+  }
+}
 
 export default function Signup() {
   const [message, setMessage] = useState('');
+  const [msgKey, setMsgKey] = useState(0);
   const initialValues = { role: 'member', email: '', password: '' };
+  const { token, role } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token && !isTokenExpired(token)) {
+      navigate(getHomePage(role), { replace: true });
+    }
+  }, [token, role, navigate]);
 
   const fields = [
     {
@@ -22,24 +51,32 @@ export default function Signup() {
     { name: 'password', label: 'Password', type: 'password' }
   ];
 
+  const showMessage = (msg) => {
+    setMessage('');
+    setTimeout(() => {
+      setMsgKey(prev => prev + 1);
+      setMessage(msg);
+    }, 20);
+  };
+
   const handleSubmit = async (values) => {
     try {
       const data = await signup(values.role, values.email, values.password);
       if (data.errors) {
-        setMessage(data.errors.join(', '));
+        showMessage(data.errors.join(', '));
       } else if (values.role === 'librarian') {
-        setMessage('Signup successful! Await admin approval before you can login.');
+        showMessage('Signup successful! Await admin approval before you can login.');
       } else {
-        setMessage('Signup successful! You can now log in.');
+        showMessage('Signup successful! You can now log in.');
       }
     } catch {
-      setMessage('Signup failed');
+      showMessage('Signup failed');
     }
   };
 
   return (
     <>
-      <TimedMessage message={message} onClose={() => setMessage('')} />
+      <TimedMessage key={msgKey} message={message} onClose={() => setMessage('')} />
       <AuthForm
         initialValues={initialValues}
         onSubmit={handleSubmit}

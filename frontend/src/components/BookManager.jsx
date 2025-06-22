@@ -87,14 +87,7 @@ export default function BookManager({
         err?.response?.data?.errors?.[0] ||
         err?.message ||
         "Error deleting book";
-      if (
-        backendMsg.toLowerCase().includes('borrowed') ||
-        backendMsg.toLowerCase().includes('pending return')
-      ) {
-        setMsg('Cannot delete: Book is currently borrowed.');
-      } else {
-        setMsg(backendMsg);
-      }
+      setMsg(backendMsg);
       refetchBooks();
     }
   };
@@ -126,7 +119,13 @@ export default function BookManager({
       });
       refetchBooks();
     } catch (err) {
-      setMsg('Error borrowing book');
+      // Show backend error message if present
+      const backendMsg =
+        err?.response?.data?.error ||
+        err?.response?.data?.errors?.[0] ||
+        err?.message ||
+        "Error borrowing book";
+      setMsg(backendMsg);
     }
   };
 
