@@ -77,6 +77,15 @@ class AuthController < ApplicationController
     end
   end
 
+  def logout
+    token = request.headers['Authorization']&.split(' ')&.last
+    if token
+      # Set the token in Redis with a 1-day expiry
+      $redis.setex("blacklist:#{token}", 24.hours.to_i, 1)
+    end
+    render json: { message: 'Logged out' }
+  end
+
   private
   def signup(role)
     user = User.new(email: params[:email], password: params[:password], role: role)

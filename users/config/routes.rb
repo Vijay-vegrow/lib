@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   post 'signup/librarian', to: 'auth#signup_librarian'
   post 'signup/member',    to: 'auth#signup_member'
   post 'login',            to: 'auth#login'
+    post '/logout', to: 'auth#logout'
   post '/api/assign_role', to: 'sessions#assign_role'
   get 'admin/dashboard',      to: 'admin#dashboard'
   post 'admin/add_admin',     to: 'admin#add_admin'

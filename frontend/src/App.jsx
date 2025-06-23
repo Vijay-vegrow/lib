@@ -120,9 +120,9 @@ function NavBar() {
             )}
             <a
               href="#"
-              onClick={e => {
+              onClick={async e => {
                 e.preventDefault();
-                logout();
+                await logout();
                 window.location.href = '/login';
               }}
               className="nav-link"

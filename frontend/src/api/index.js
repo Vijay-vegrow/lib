@@ -123,3 +123,7 @@ export function fetchAllUsers() {
 export function deleteUser(id) {
   return api.delete(`/admin/users/${id}`);
 }
+
+export function apiLogout() {
+  return api.post('/logout');
+}

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiLogout } from '../api'; // Add this import
 
 let tokenGetter = () => null;
 let roleGetter = () => null;
@@ -43,7 +44,12 @@ export function AuthProvider({ children }) {
     setRole(role);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiLogout(); // Call backend to blacklist token
+    } catch (e) {
+      // Optionally handle error (e.g., network error)
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     setToken(null);
