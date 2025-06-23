@@ -43,25 +43,19 @@ class AuthController < ApplicationController
   end
 
   def google_oauth2_token
-    access_token = params[:access_token]
-    if access_token.blank?
-      render json: { error: 'No access token provided' }, status: :bad_request and return
+    id_token = params[:credential] || params[:id_token] || params[:access_token]
+    if id_token.blank?
+      render json: { error: 'No ID token provided' }, status: :bad_request and return
     end
 
+    validator = GoogleIDToken::Validator.new
     begin
-      client = Signet::OAuth2::Client.new(access_token: access_token)
-      service = Google::Apis::Oauth2V2::Oauth2Service.new
-      service.authorization = client
-      profile = service.get_userinfo
-
-      unless profile&.email
-        render json: { error: 'Could not fetch Google profile' }, status: :unauthorized and return
-      end
-
-      user = User.find_by(email: profile.email)
+      payload = validator.check(id_token, ENV['GOOGLE_CLIENT_ID'])
+      email = payload['email']
+      user = User.find_by(email: email)
       unless user
         # User does not exist, ask frontend to select role
-        render json: { email: profile.email }, status: :ok and return
+        render json: { email: email }, status: :ok and return
       end
 
       # Block unapproved librarians
@@ -73,7 +67,7 @@ class AuthController < ApplicationController
       render json: { token: token, role: user.role }, status: :ok
     rescue => e
       Rails.logger.error "Google OAuth error: #{e.message}"
-      render json: { error: 'Invalid Google token' }, status: :unauthorized
+      render json: { error: 'Invalid Google ID token' }, status: :unauthorized
     end
   end
 

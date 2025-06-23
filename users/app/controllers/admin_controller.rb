@@ -64,13 +64,14 @@ class AdminController < ApplicationController
       return render json: { error: 'User not found' }, status: :not_found
     end
 
-    # Prevent deletion if user has active borrowings
+    # Prevent deletion if user has any active or pending borrowings
     if user.borrowings.where(status: ['borrowed', 'return_requested']).exists?
       return render json: { error: 'Cannot delete user with active or pending borrowings.' }, status: :unprocessable_entity
     end
 
+    # If only returned or no borrowings, delete user and all their borrowings
     if user.destroy
-      render json: { message: 'User deleted successfully.' }
+      render json: { message: 'User and their borrowings deleted successfully.' }
     else
       render json: { error: user.errors.full_messages.join(', ') }, status: :unprocessable_entity
     end

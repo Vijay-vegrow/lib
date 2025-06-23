@@ -109,8 +109,15 @@ export default function AdminPanel() {
         setUsers(users.filter(u => u.id !== userToDelete.id));
         showAdminMsg('User deleted successfully.');
       })
-      .catch(() => {
-        showAdminMsg('Error deleting user');
+      .catch(async (err) => {
+        let msg = 'Error deleting user';
+        // Try to extract backend error message
+        if (err.response && err.response.data && err.response.data.error) {
+          msg = err.response.data.error;
+        } else if (err.message) {
+          msg = err.message;
+        }
+        showAdminMsg(msg);
       })
       .finally(() => {
         setUserDeleteModalOpen(false);

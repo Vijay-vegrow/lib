@@ -1,5 +1,4 @@
 class SessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token
 
   def assign_role
     user = User.find_by(email: params[:email])

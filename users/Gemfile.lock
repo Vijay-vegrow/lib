@@ -128,6 +128,8 @@ GEM
     google-cloud-env (2.3.1)
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
+    google-id-token (1.4.2)
+      jwt (>= 1)
     google-logging-utils (0.2.0)
     googleauth (1.14.0)
       faraday (>= 1.0, < 3.a)
@@ -395,6 +397,7 @@ DEPENDENCIES
   debug
   dotenv-rails
   google-apis-oauth2_v2
+  google-id-token
   jwt
   kamal
   kaminari
